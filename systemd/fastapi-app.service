@@ -1,0 +1,47 @@
+[Unit]
+Description=FastAPI Application
+Documentation=https://fastapi.tiangolo.com/
+After=network.target
+Wants=network.target
+
+[Service]
+Type=exec
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/fastapi-app
+Environment=PATH=/home/ubuntu/fastapi-app/venv/bin
+Environment=PYTHONPATH=/home/ubuntu/fastapi-app
+Environment=ENVIRONMENT=production
+Environment=DEBUG=false
+
+# Application startup
+ExecStart=/home/ubuntu/fastapi-app/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Restart policy
+Restart=always
+RestartSec=3
+StartLimitInterval=60s
+StartLimitBurst=3
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/ubuntu/fastapi-app
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=fastapi-app
+
+[Install]
+WantedBy=multi-user.target
