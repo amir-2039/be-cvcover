@@ -7,15 +7,20 @@ from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.api.v1.api import api_router
 from app.core.exceptions import CustomException
+from app.db.base import init_db, close_db
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     print("Starting up the application...")
+    await init_db()
+    print("Database initialized successfully")
     yield
     # Shutdown
     print("Shutting down the application...")
+    await close_db()
+    print("Database connections closed")
 
 
 app = FastAPI(

@@ -1,74 +1,100 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from app.models.schemas import Token, UserResponse
-from app.core.exceptions import UnauthorizedException
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.models.schemas import Token, UserResponse, UserCreate
+from app.core.exceptions import UnauthorizedException, ValidationException
+from app.db.base import get_db
+from app.db.service import AuthService, UserService
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# Mock user for authentication demo
-fake_users_db = {
-    "test@example.com": {
-        "id": 1,
-        "email": "test@example.com",
-        "full_name": "Test User",
-        "is_active": True,
-        "hashed_password": "fakehashedpassword"  # In real app, use proper password hashing
-    }
-}
-
-
-def fake_hash_password(password: str):
-    return "fakehashed" + password
-
-
-def get_user(email: str):
-    if email in fake_users_db:
-        user_dict = fake_users_db[email]
-        return user_dict
-
-
-def fake_verify_password(plain_password, hashed_password):
-    return fake_hash_password(plain_password) == hashed_password
-
 
 @router.post("/token", response_model=Token)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    request: Request = None,
+    db: AsyncSession = Depends(get_db)
+):
     """Authenticate user and return access token"""
-    user = get_user(form_data.username)
-    if not user:
-        raise UnauthorizedException("Incorrect email or password")
-    if not fake_verify_password(form_data.password, user["hashed_password"]):
+    auth_service = AuthService(db)
+    
+    # Get client IP and user agent
+    ip_address = request.client.host if request else None
+    user_agent = request.headers.get("user-agent") if request else None
+    
+    session = await auth_service.login(
+        email=form_data.username,
+        password=form_data.password,
+        ip_address=ip_address,
+        user_agent=user_agent
+    )
+    
+    if not session:
         raise UnauthorizedException("Incorrect email or password")
     
-    # In a real application, you would generate a proper JWT token here
-    access_token = "fake-access-token"
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": session.session_token, "token_type": "bearer"}
 
 
 @router.get("/me", response_model=UserResponse)
-async def read_users_me(token: str = Depends(oauth2_scheme)):
+async def read_users_me(
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db)
+):
     """Get current user information"""
-    # In a real application, you would verify the JWT token here
-    if token != "fake-access-token":
+    auth_service = AuthService(db)
+    
+    user = await auth_service.get_current_user(token)
+    if not user:
         raise UnauthorizedException("Invalid token")
     
-    user = get_user("test@example.com")
     return user
 
 
-@router.post("/register")
-async def register(email: str, password: str, full_name: str):
+@router.post("/register", response_model=UserResponse)
+async def register(
+    user_data: UserCreate,
+    db: AsyncSession = Depends(get_db)
+):
     """Register a new user"""
-    if email in fake_users_db:
-        raise HTTPException(status_code=400, detail="Email already registered")
+    user_service = UserService(db)
     
-    fake_users_db[email] = {
-        "id": len(fake_users_db) + 1,
-        "email": email,
-        "full_name": full_name,
-        "is_active": True,
-        "hashed_password": fake_hash_password(password)
-    }
+    try:
+        user = await user_service.create_user(
+            email=user_data.email,
+            full_name=user_data.full_name,
+            password=user_data.password
+        )
+        return user
+    except ValidationException as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/logout")
+async def logout(
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db)
+):
+    """Logout user by invalidating session"""
+    auth_service = AuthService(db)
     
-    return {"message": "User registered successfully"}
+    success = await auth_service.logout(token)
+    if not success:
+        raise UnauthorizedException("Invalid token")
+    
+    return {"message": "Successfully logged out"}
+
+
+@router.post("/refresh")
+async def refresh_token(
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db)
+):
+    """Refresh user session"""
+    auth_service = AuthService(db)
+    
+    session = await auth_service.refresh_session(token)
+    if not session:
+        raise UnauthorizedException("Invalid token")
+    
+    return {"access_token": session.session_token, "token_type": "bearer"}
