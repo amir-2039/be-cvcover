@@ -70,7 +70,15 @@ setup_app_directory() {
         log "Created application directory: $APP_DIR"
     fi
     
-    cd "$APP_DIR"
+    # Navigate to application directory
+    cd "$APP_DIR" || error "Failed to navigate to application directory: $APP_DIR"
+    
+    # Verify we're in the right directory
+    if [ ! -f "requirements.txt" ]; then
+        error "requirements.txt not found in $APP_DIR. Make sure you're running this script from the correct location."
+    fi
+    
+    log "Working directory: $(pwd)"
 }
 
 # Setup Python virtual environment
@@ -190,6 +198,11 @@ start_application() {
 deploy() {
     log "Starting deployment process..."
     
+    # Check if we're in the right directory (should contain requirements.txt)
+    if [ ! -f "requirements.txt" ]; then
+        error "requirements.txt not found. Please run this script from the project root directory."
+    fi
+    
     check_root
     update_system
     install_dependencies
@@ -210,7 +223,13 @@ deploy() {
 update() {
     log "Updating application..."
     
-    cd "$APP_DIR"
+    # Navigate to application directory
+    cd "$APP_DIR" || error "Failed to navigate to application directory: $APP_DIR"
+    
+    # Verify we're in the right directory
+    if [ ! -f "requirements.txt" ]; then
+        error "requirements.txt not found in $APP_DIR"
+    fi
     
     # Pull latest changes
     git pull origin main
