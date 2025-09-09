@@ -6,11 +6,11 @@
 set -e  # Exit on any error
 
 # Configuration
-APP_NAME="fastapi-app"
-APP_DIR="/home/ubuntu/fastapi-app"
-SERVICE_NAME="fastapi-app"
-NGINX_CONFIG="/etc/nginx/sites-available/fastapi-app"
-NGINX_ENABLED="/etc/nginx/sites-enabled/fastapi-app"
+APP_NAME="be-cvcover"
+APP_DIR="/home/ubuntu/be-cvcover"
+SERVICE_NAME="be-cvcover"
+NGINX_CONFIG="/etc/nginx/sites-available/be-cvcover"
+NGINX_ENABLED="/etc/nginx/sites-enabled/be-cvcover"
 
 # Colors for output
 RED='\033[0;31m'

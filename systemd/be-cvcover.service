@@ -8,14 +8,14 @@ Wants=network.target
 Type=exec
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/home/ubuntu/fastapi-app
-Environment=PATH=/home/ubuntu/fastapi-app/venv/bin
-Environment=PYTHONPATH=/home/ubuntu/fastapi-app
+WorkingDirectory=/home/ubuntu/be-cvcover
+Environment=PATH=/home/ubuntu/be-cvcover/venv/bin
+Environment=PYTHONPATH=/home/ubuntu/be-cvcover
 Environment=ENVIRONMENT=production
 Environment=DEBUG=false
 
 # Application startup
-ExecStart=/home/ubuntu/fastapi-app/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+ExecStart=/home/ubuntu/be-cvcover/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
 ExecReload=/bin/kill -HUP $MAINPID
 
 # Restart policy
@@ -29,7 +29,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/home/ubuntu/fastapi-app
+ReadWritePaths=/home/ubuntu/be-cvcover
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true

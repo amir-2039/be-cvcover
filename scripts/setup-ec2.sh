@@ -114,8 +114,8 @@ create_app_user() {
     fi
     
     # Create application directory
-    mkdir -p /home/ubuntu/fastapi-app
-    chown ubuntu:ubuntu /home/ubuntu/fastapi-app
+    mkdir -p /home/ubuntu/be-cvcover
+    chown ubuntu:ubuntu /home/ubuntu/be-cvcover
 }
 
 # Setup SSH key for GitHub Actions
@@ -146,7 +146,7 @@ configure_nginx() {
     rm -f /etc/nginx/sites-enabled/default
     
     # Create basic configuration
-    cat > /etc/nginx/sites-available/fastapi-app << 'EOF'
+    cat > /etc/nginx/sites-available/be-cvcover << 'EOF'
 server {
     listen 80;
     server_name _;
@@ -167,7 +167,7 @@ server {
 EOF
 
     # Enable the site
-    ln -sf /etc/nginx/sites-available/fastapi-app /etc/nginx/sites-enabled/
+    ln -sf /etc/nginx/sites-available/be-cvcover /etc/nginx/sites-enabled/
     
     # Test configuration
     nginx -t
@@ -183,8 +183,8 @@ EOF
 setup_log_rotation() {
     log "Setting up log rotation..."
     
-    cat > /etc/logrotate.d/fastapi-app << 'EOF'
-/var/log/fastapi-app/*.log {
+    cat > /etc/logrotate.d/be-cvcover << 'EOF'
+/var/log/be-cvcover/*.log {
     daily
     missingok
     rotate 14
@@ -193,7 +193,7 @@ setup_log_rotation() {
     notifempty
     create 644 ubuntu ubuntu
     postrotate
-        systemctl reload fastapi-app
+        systemctl reload be-cvcover
     endscript
 }
 EOF
@@ -231,8 +231,8 @@ echo "Memory Usage:"
 free -h
 echo "Disk Usage:"
 df -h
-echo "FastAPI Service Status:"
-systemctl status fastapi-app --no-pager
+    echo "FastAPI Service Status:"
+    systemctl status be-cvcover --no-pager
 echo "Nginx Status:"
 systemctl status nginx --no-pager
 EOF
@@ -260,17 +260,17 @@ main() {
     
     echo ""
     info "Next steps:"
-    info "1. Clone your repository: git clone <your-repo-url> /home/ubuntu/fastapi-app"
-    info "2. Run the deployment script: cd /home/ubuntu/fastapi-app && ./scripts/deploy.sh deploy"
+    info "1. Clone your repository: git clone <your-repo-url> /home/ubuntu/be-cvcover"
+    info "2. Run the deployment script: cd /home/ubuntu/be-cvcover && ./scripts/deploy.sh deploy"
     info "3. Setup GitHub Actions secrets for automated deployment"
     info "4. Configure SSL certificate (recommended for production)"
     
     echo ""
     info "Useful commands:"
     info "- Monitor system: /home/ubuntu/monitor.sh"
-    info "- Check logs: journalctl -u fastapi-app -f"
-    info "- Restart app: systemctl restart fastapi-app"
-    info "- Check status: systemctl status fastapi-app"
+    info "- Check logs: journalctl -u be-cvcover -f"
+    info "- Restart app: systemctl restart be-cvcover"
+    info "- Check status: systemctl status be-cvcover"
 }
 
 # Run main function

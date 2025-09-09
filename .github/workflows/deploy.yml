@@ -42,7 +42,7 @@ jobs:
         port: ${{ secrets.EC2_PORT }}
         script: |
           # Navigate to application directory
-          cd /home/${{ secrets.EC2_USERNAME }}/fastapi-app
+          cd /home/${{ secrets.EC2_USERNAME }}/be-cvcover
           
           # Pull latest changes
           git pull origin main
@@ -57,10 +57,10 @@ jobs:
           # alembic upgrade head
           
           # Restart the application service
-          sudo systemctl restart fastapi-app
+          sudo systemctl restart be-cvcover
           
           # Check service status
-          sudo systemctl status fastapi-app
+          sudo systemctl status be-cvcover
           
           # Reload Nginx configuration
           sudo nginx -t && sudo systemctl reload nginx
