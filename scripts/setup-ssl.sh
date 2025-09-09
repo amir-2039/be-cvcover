@@ -54,7 +54,7 @@ install_certbot() {
 check_domain() {
     log "Checking domain resolution..."
     
-    DOMAIN="app.cvcover.ai"
+    DOMAIN="app.cvcoverai.com"
     
     # Check if domain resolves to this server
     RESOLVED_IP=$(dig +short $DOMAIN)
@@ -75,10 +75,10 @@ check_domain() {
 
 # Get SSL certificate
 get_certificate() {
-    log "Getting SSL certificate for app.cvcover.ai..."
+    log "Getting SSL certificate for app.cvcoverai.com..."
     
     # Run Certbot
-    certbot --nginx -d app.cvcover.ai --non-interactive --agree-tos --email admin@cvcover.ai
+    certbot --nginx -d app.cvcoverai.com --non-interactive --agree-tos --email admin@cvcoverai.com
     
     log "SSL certificate obtained successfully"
 }
@@ -104,7 +104,7 @@ check_certificate() {
     
     # Test HTTPS
     log "Testing HTTPS connection..."
-    if curl -s -o /dev/null -w "%{http_code}" https://app.cvcover.ai/health | grep -q "200"; then
+    if curl -s -o /dev/null -w "%{http_code}" https://app.cvcoverai.com/health | grep -q "200"; then
         log "HTTPS is working correctly"
     else
         warning "HTTPS test failed"
@@ -129,7 +129,7 @@ update_nginx_config() {
 
 # Main setup function
 main() {
-    log "Starting SSL setup for app.cvcover.ai..."
+    log "Starting SSL setup for app.cvcoverai.com..."
     
     check_root
     install_certbot
@@ -143,9 +143,9 @@ main() {
     
     echo ""
     info "Your site is now available at:"
-    info "https://app.cvcover.ai"
-    info "https://app.cvcover.ai/health"
-    info "https://app.cvcover.ai/docs"
+    info "https://app.cvcoverai.com"
+    info "https://app.cvcoverai.com/health"
+    info "https://app.cvcoverai.com/docs"
     
     echo ""
     info "Certificate will auto-renew every 90 days"
@@ -179,7 +179,7 @@ test_renew() {
 # Test HTTPS
 test_https() {
     log "Testing HTTPS connection..."
-    curl -I https://app.cvcover.ai/health
+    curl -I https://app.cvcoverai.com/health
 }
 
 # Main script logic

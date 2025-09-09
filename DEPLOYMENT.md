@@ -15,7 +15,7 @@ This guide will help you deploy your FastAPI application to an EC2 instance usin
 ## Prerequisites
 
 - AWS EC2 instance (Ubuntu 20.04+ recommended)
-- Domain name (app.cvcover.ai configured)
+- Domain name (app.cvcoverai.com configured)
 - GitHub repository with your FastAPI application
 - Basic knowledge of Linux commands and SSH
 
@@ -176,7 +176,7 @@ sudo systemctl status fastapi-app
 sudo apt install -y certbot python3-certbot-nginx
 
 # Get SSL certificate
-sudo certbot --nginx -d app.cvcover.ai
+sudo certbot --nginx -d app.cvcoverai.com
 
 # Test automatic renewal
 sudo certbot renew --dry-run
@@ -220,10 +220,10 @@ free -h
 
 ```bash
 # Test health endpoint
-curl http://app.cvcover.ai/health
+curl http://app.cvcoverai.com/health
 
 # Test API endpoint
-curl http://app.cvcover.ai/api/v1/users/
+curl http://app.cvcoverai.com/api/v1/users/
 ```
 
 ### Backup Strategy
@@ -354,6 +354,6 @@ For issues and questions:
 1. Check the application logs: `sudo journalctl -u fastapi-app -f`
 2. Check Nginx logs: `sudo tail -f /var/log/nginx/error.log`
 3. Verify service status: `sudo systemctl status fastapi-app`
-4. Test endpoints: `curl http://app.cvcover.ai/health`
+4. Test endpoints: `curl http://app.cvcoverai.com/health`
 
-The configuration is now set up for app.cvcover.ai domain with Cloudflare integration.
+The configuration is now set up for app.cvcoverai.com domain with Cloudflare integration.

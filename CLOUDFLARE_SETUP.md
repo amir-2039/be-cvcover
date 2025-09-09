@@ -1,4 +1,4 @@
-# Cloudflare Setup for app.cvcover.ai
+# Cloudflare Setup for app.cvcoverai.com
 
 This guide helps you configure Cloudflare for your FastAPI application deployed on EC2.
 
@@ -17,7 +17,7 @@ In your Cloudflare dashboard:
 2. **Optional CNAME Record:**
    - **Type**: CNAME
    - **Name**: www.app
-   - **Target**: app.cvcover.ai
+   - **Target**: app.cvcoverai.com
    - **Proxy status**: Proxied (orange cloud) ✅
 
 ### 2. SSL/TLS Settings
@@ -31,11 +31,11 @@ In your Cloudflare dashboard:
 Create page rules for better performance:
 
 1. **Cache Everything:**
-   - URL: `app.cvcover.ai/static/*`
+   - URL: `app.cvcoverai.com/static/*`
    - Settings: Cache Level = Cache Everything, Edge Cache TTL = 1 month
 
 2. **Bypass Cache for API:**
-   - URL: `app.cvcover.ai/api/*`
+   - URL: `app.cvcoverai.com/api/*`
    - Settings: Cache Level = Bypass
 
 ### 4. Security Settings
@@ -72,13 +72,13 @@ Create page rules for better performance:
 
 ```bash
 # Test from your server
-curl -H "Host: app.cvcover.ai" http://localhost/health
+curl -H "Host: app.cvcoverai.com" http://localhost/health
 
 # Test from external
-curl https://app.cvcover.ai/health
+curl https://app.cvcoverai.com/health
 
 # Check SSL certificate
-openssl s_client -connect app.cvcover.ai:443 -servername app.cvcover.ai
+openssl s_client -connect app.cvcoverai.com:443 -servername app.cvcoverai.com
 ```
 
 ## Troubleshooting
