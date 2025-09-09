@@ -53,8 +53,8 @@ jobs:
           # Install/update dependencies
           pip install -r requirements.txt
           
-          # Run database migrations (if any)
-          # alembic upgrade head
+          # Run database migrations
+          alembic upgrade head
           
           # Restart the application service
           sudo systemctl restart be-cvcover

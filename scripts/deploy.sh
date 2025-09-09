@@ -58,7 +58,9 @@ install_dependencies() {
         curl \
         build-essential \
         libpq-dev \
-        postgresql-client
+        postgresql-client \
+        postgresql \
+        postgresql-contrib
 }
 
 # Setup application directory
@@ -101,6 +103,38 @@ install_python_deps() {
     source venv/bin/activate
     pip install -r requirements.txt
     log "Python dependencies installed"
+}
+
+# Setup PostgreSQL database
+setup_database() {
+    log "Setting up PostgreSQL database..."
+    
+    # Start PostgreSQL service
+    sudo systemctl start postgresql
+    sudo systemctl enable postgresql
+    
+    # Create database and user if they don't exist
+    sudo -u postgres psql -c "CREATE DATABASE be_cvcover;" 2>/dev/null || log "Database already exists"
+    sudo -u postgres psql -c "CREATE USER cvcover_user WITH PASSWORD 'postgres';" 2>/dev/null || log "User already exists"
+    sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE be_cvcover TO cvcover_user;" 2>/dev/null || true
+    sudo -u postgres psql -c "ALTER USER cvcover_user CREATEDB;" 2>/dev/null || true
+    
+    log "PostgreSQL database setup completed"
+}
+
+# Run database migrations
+run_migrations() {
+    log "Running database migrations..."
+    source venv/bin/activate
+    
+    # Create initial migration if it doesn't exist
+    if [ ! -d "alembic/versions" ] || [ -z "$(ls -A alembic/versions)" ]; then
+        alembic revision --autogenerate -m "Initial migration"
+    fi
+    
+    # Run migrations
+    alembic upgrade head
+    log "Database migrations completed"
 }
 
 # Create systemd service file
@@ -206,9 +240,11 @@ deploy() {
     check_root
     update_system
     install_dependencies
+    setup_database
     setup_app_directory
     setup_venv
     install_python_deps
+    run_migrations
     create_systemd_service
     configure_nginx
     setup_firewall
@@ -237,6 +273,9 @@ update() {
     # Update dependencies
     source venv/bin/activate
     pip install -r requirements.txt
+    
+    # Run database migrations
+    alembic upgrade head
     
     # Restart service
     sudo systemctl restart ${SERVICE_NAME}
