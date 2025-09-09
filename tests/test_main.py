@@ -51,7 +51,8 @@ def test_create_user():
     user_data = {
         "email": "newuser@example.com",
         "full_name": "New User",
-        "is_active": True
+        "is_active": True,
+        "password": "testpassword123"
     }
     response = client.post("/api/v1/users/", json=user_data)
     assert response.status_code == 200
@@ -64,7 +65,7 @@ def test_auth_token():
     """Test authentication token endpoint"""
     form_data = {
         "username": "test@example.com",
-        "password": "testpassword"
+        "password": "password"  # This matches the fake hashed password in auth.py
     }
     response = client.post("/api/v1/auth/token", data=form_data)
     assert response.status_code == 200
